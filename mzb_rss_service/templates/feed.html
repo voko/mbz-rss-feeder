@@ -1,0 +1,72 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>Edit Feed: {{ feed.name }}</h2>
+
+    <h3>Artists in this feed</h3>
+    <ul>
+        {% for artist in feed.artists %}
+            <li>
+                {{ artist.name }}
+                <div class="item-actions">
+                    <form class="form-inline" action="{{ url_for('remove_artist', feed_id=feed.id, artist_id=artist.id) }}" method="post">
+                        <button type="submit">Remove</button>
+                    </form>
+                </div>
+            </li>
+        {% else %}
+            <li>No artists in this feed.</li>
+        {% endfor %}
+    </ul>
+
+    <h3>Add Artist</h3>
+    <form onsubmit="return false;">
+        <input type="text" id="artist-search" placeholder="Search for an artist...">
+    </form>
+    <div id="search-results"></div>
+
+    <script>
+        const searchInput = document.getElementById('artist-search');
+        const resultsDiv = document.getElementById('search-results');
+        let searchTimeout;
+
+        searchInput.addEventListener('input', () => {
+            clearTimeout(searchTimeout);
+            const query = searchInput.value;
+            if (query.length < 3) {
+                resultsDiv.innerHTML = '';
+                return;
+            }
+            searchTimeout = setTimeout(() => {
+                fetch(`{{ url_for('search_artist') }}?q=${encodeURIComponent(query)}`)
+                    .then(response => response.json())
+                    .then(artists => {
+                        resultsDiv.innerHTML = '<h4>Search Results</h4>';
+                        if (artists.length === 0) {
+                            resultsDiv.innerHTML += '<p>No artists found.</p>';
+                            return;
+                        }
+                        const list = document.createElement('ul');
+                        artists.forEach(artist => {
+                            const item = document.createElement('li');
+                            item.innerHTML = `
+                                <div>
+                                    ${artist.name} (${artist.country || 'N/A'})
+                                </div>
+                                <div class="item-actions">
+                                    <form class="form-inline" action="{{ url_for('add_artist', feed_id=feed.id) }}" method="post">
+                                        <input type="hidden" name="artist_id" value="${artist.id}">
+                                        <input type="hidden" name="artist_name" value="${artist.name}">
+                                        <button type="submit">Add</button>
+                                    </form>
+                                </div>
+                            `;
+                            list.appendChild(item);
+                        });
+                        resultsDiv.appendChild(list);
+                    });
+            }, 300);
+        });
+    </script>
+{% endblock %}

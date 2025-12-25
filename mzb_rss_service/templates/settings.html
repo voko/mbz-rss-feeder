@@ -1,0 +1,19 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>Settings</h2>
+    <form method="post">
+        <div>
+            <label for="days_back">Days to look back for releases:</label>
+            <input type="number" id="days_back" name="days_back" value="{{ settings.days_back }}" required>
+        </div>
+        <br>
+        <div>
+            <label for="cache_time_hours">Cache time (hours):</label>
+            <input type="number" id="cache_time_hours" name="cache_time_hours" value="{{ settings.cache_time_hours }}" required>
+        </div>
+        <br>
+        <button type="submit">Save Settings</button>
+    </form>
+{% endblock %}

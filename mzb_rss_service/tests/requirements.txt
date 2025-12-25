@@ -1,0 +1,7 @@
+Flask
+PyYAML
+musicbrainzngs
+feedgen
+gunicorn
+pytest
+pytz

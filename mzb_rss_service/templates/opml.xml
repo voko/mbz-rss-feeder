@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<opml version="2.0">
+    <head>
+        <title>MusicBrainz Artist Feeds</title>
+    </head>
+    <body>
+        <outline text="MusicBrainz Artist Feeds" title="MusicBrainz Artist Feeds">
+            {% for feed in feeds %}
+            <outline type="rss" text="{{ (feed.artists | map(attribute='name') | sort | join(', ')) }}" title="{{ feed.name }} ({{ feed.artists | length }} artists)" xmlUrl="{{ url_for('get_feed_rss', feed_id=feed.id, _external=True) }}"/>
+            {% endfor %}
+        </outline>
+    </body>
+</opml>

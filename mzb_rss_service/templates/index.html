@@ -1,0 +1,31 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>Feeds</h2>
+    <ul>
+        {% for feed in feeds %}
+            <li>
+                <div>
+                    <a href="{{ url_for('edit_feed', feed_id=feed.id) }}">{{ feed.name }}</a>
+                    ({{ feed.artists|length }})
+                </div>
+                <div class="item-actions">
+                    <a href="{{ url_for('get_feed_rss', feed_id=feed.id) }}">RSS</a>
+                    <form class="form-inline" action="{{ url_for('delete_feed', feed_id=feed.id) }}" method="post">
+                        <button type="submit">Delete</button>
+                    </form>
+                </div>
+            </li>
+        {% else %}
+            <li>No feeds configured.</li>
+        {% endfor %}
+    </ul>
+
+    <h3>Create New Feed</h3>
+    <form action="{{ url_for('create_feed') }}" method="post">
+        <label for="name">Feed Name:</label>
+        <input type="text" id="name" name="name" required>
+        <button type="submit">Create</button>
+    </form>
+{% endblock %}

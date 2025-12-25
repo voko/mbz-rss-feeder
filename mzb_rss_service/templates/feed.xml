@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>{{ feed.name }}</title>
+        <link>{{ request.url_root }}</link>
+        <description>Latest album releases for artists in the '{{ feed.name }}' feed.</description>
+        <language>en</language>
+        <lastBuildDate>{{ last_build_date }}</lastBuildDate>
+        <atom:link href="{{ request.url }}" rel="self" type="application/rss+xml" />
+
+        {% for release in releases %}
+        <item>
+            <title>{{ release.artist.name }} - {{ release.title }}</title>
+            <link>https://musicbrainz.org/release/{{ release.id }}</link>
+            <guid isPermaLink="false">{{ release.id }}</guid>
+            <description><![CDATA[
+                <p><b>{{ release.artist.name }}</b> <i>{{ release.title }}</i><br>
+                Release Date: {{ release.date }}</p>
+                {% if release.hasCoverArt %}
+                    <img src="http://coverartarchive.org/release/{{ release.id }}/front-500" alt="Cover Art {{ release.title }}">
+                {% endif %}
+            ]]></description>
+            {% if release.pub_date %}
+            <pubDate>{{ release.pub_date }}</pubDate>
+            {% endif %}
+        </item>
+        {% endfor %}
+    </channel>
+</rss>
