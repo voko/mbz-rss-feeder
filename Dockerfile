@@ -11,16 +11,18 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Default config and data paths
+# persistence directory/volume is mounted to /var/mbz-rss-feeder
 ENV FEEDS_FILE_PATH=/var/mbz-rss-feeder/feeds.yml
-ENV CONFIG_FILE_PATH=/etc/mbz-rss-feeder.yml
+ENV CONFIG_FILE_PATH=/var/mbz-rss-feeder/etc/mbz-rss-feeder.yml
 ENV CACHE_DIR=/var/mbz-rss-feeder/cache
-ENV LOG_FILE=/var/log/mbz-rss-feeder.log
+ENV LOG_FILE=/var/mbz-rss-feeder/log/mbz-rss-feeder.log
 ENV LOG_LEVEL=INFO
+ENV MBZ_LOG_LEVEL=WARNING
 
-RUN mkdir -p /var/mbz-rss-feeder/cache \
-    && touch /var/log/mbz-rss-feeder.log \
+RUN mkdir -p /var/mbz-rss-feeder/cache /var/mbz-rss-feeder/log /var/mbz-rss-feeder/etc \
+    && touch /var/mbz-rss-feeder/log/mbz-rss-feeder.log \
     && touch /var/mbz-rss-feeder/feeds.yml \
-    && touch /etc/mbz-rss-feeder.yml
+    && touch /var/mbz-rss-feeder/etc/mbz-rss-feeder.yml
 
 # Test stage
 FROM builder AS test
