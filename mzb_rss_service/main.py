@@ -55,7 +55,7 @@ for handler in werkzeug_logger.handlers:
 logger = logging.getLogger(__name__)
 
 
-logger.info("Starting mzb-rss-service with the following configuration:")
+logger.info(f"Starting mzb-rss-service v{config.VERSION} with the following configuration:")
 logger.info(f"  - Log Level: {log_level_str}")
 logger.info(f"  - Log File: {log_file}")
 logger.info(f"  - Feeds File: {config.FEEDS_FILE_PATH}")
@@ -69,6 +69,26 @@ logger.info(f"  - MusicBrainz Log Level: {mbz_log_level_str}")
 # init
 musicbrainz.init_musicbrainz()
 app = Flask(__name__)
+
+class ReverseProxied(object):
+    def __init__(self, app):
+        self.app = app
+
+    def __call__(self, environ, start_response):
+        script_name = environ.get('HTTP_X_FORWARDED_PREFIX', '')
+        if script_name:
+            logger.debug(f"Redirect prefix: {script_name}")
+            environ['SCRIPT_NAME'] = script_name
+            path_info = environ['PATH_INFO']
+            if path_info.startswith(script_name):
+                environ['PATH_INFO'] = path_info[len(script_name):]
+        else:
+            logger.debug("No redirect prefix detected")
+
+        return self.app(environ, start_response)
+
+app.wsgi_app = ReverseProxied(app.wsgi_app)
+
 app.template_folder = 'templates'
 
 
