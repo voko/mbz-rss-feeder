@@ -39,12 +39,10 @@ Updates to the configuration will also create a timestamped backup of the previo
 
 ### deployment
 #### docker
+This is a local container running with data stored in ./local/testdata 
 `docker run \
   -p 8080:8080 -e LOG_LEVEL=debug --rm --name mbz-rss\
-  -v ./local/testdata/feeds.yml:/var/mbz-rss-feeder/feeds.yml \
-  -v ./local/testdata/mbz-rss-feeder.yml:/etc/mbz-rss-feeder.yml \
-  -v ./local/testdata/cache:/var/mbz-rss-feeder/cache \
-  -v ./local/testdata/mbz-rss-feeder.log:/var/mbz-rss-feeder.log \
+  -v ./local/testdata/:/var/mbz-rss-feeder \
   --env-file ./local/testdata/.env \
   docker.io/library/mzb-rss-feeder:1.0.0`
 

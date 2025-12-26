@@ -9,7 +9,7 @@ import uuid
 logger = logging.getLogger(__name__)
 
 FEEDS_FILE_PATH = os.path.expandvars(os.environ.get('FEEDS_FILE_PATH', '/var/mbz-rss-feeder/feeds.yml'))
-CONFIG_FILE_PATH = os.path.expandvars(os.environ.get('CONFIG_FILE_PATH', '/etc/mbz-rss-feeder.yml'))
+CONFIG_FILE_PATH = os.path.expandvars(os.environ.get('CONFIG_FILE_PATH', '/var/mbz-rss-feeder/etc/mbz-rss-feeder.yml'))
 CACHE_DIR = os.path.expandvars(os.environ.get('CACHE_DIR', '/var/mbz-rss-feeder/cache'))
 MB_APP_NAME = os.path.expandvars(os.environ.get('MB_APP_NAME', 'mzb-rss-service'))
 MB_VERSION = os.path.expandvars(os.environ.get('MB_VERSION', '0.1.0'))

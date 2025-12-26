@@ -11,10 +11,10 @@ from . import musicbrainz
 
 log_level_str = os.environ.get('LOG_LEVEL', 'INFO').upper()
 log_level = getattr(logging, log_level_str, logging.INFO)
-log_file = os.path.expandvars(os.environ.get('LOG_FILE', '/var/log/mbz-rss-feeder.log'))
+log_file = os.path.expandvars(os.environ.get('LOG_FILE', '/var/mbz-rss-feeder/log/mbz-rss-feeder.log'))
 log_format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-mbz_log_level_str = os.environ.get('LOG_LEVEL', 'WARNING').upper()
-mbz_log_level = os.environ.get('MBZ_LOG_LEVEL', logging.WARNING)
+mbz_log_level_str = os.environ.get('MBZ_LOG_LEVEL', 'WARNING').upper()
+mbz_log_level = getattr(logging, mbz_log_level_str, logging.WARNING)
 
 # Configure root logger
 root_logger = logging.getLogger()
