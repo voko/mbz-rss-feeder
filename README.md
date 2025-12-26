@@ -16,7 +16,8 @@ You can manage feeds and artists in the web UI:
   - add an artist
   - remove an artist
 
-**Artist Search*
+**Artist Search**
+
 When adding an artist, the service will query the musicbrainz API for the given string and return a list of matching artists. 
 The user can then click on the artist to add to the feed.
 

@@ -15,11 +15,26 @@ MB_APP_NAME = os.path.expandvars(os.environ.get('MB_APP_NAME', 'mzb-rss-service'
 MB_VERSION = os.path.expandvars(os.environ.get('MB_VERSION', '0.1.0'))
 MB_CONTACT = os.path.expandvars(os.environ.get('MB_CONTACT', 'someone@somewhere.com'))
 
+# file system dir check
+if not os.path.exists(CACHE_DIR):
+    os.makedirs(CACHE_DIR)
+if not os.path.exists(os.path.dirname(FEEDS_FILE_PATH)):
+    os.makedirs(os.path.dirname(FEEDS_FILE_PATH))
+if not os.path.exists(os.path.dirname(CONFIG_FILE_PATH)):
+    os.makedirs(os.path.dirname(CONFIG_FILE_PATH))
 
 class Config:
     def __init__(self):
         self._feeds_data = self._load_yaml(FEEDS_FILE_PATH)
-        self._settings = self._load_yaml(CONFIG_FILE_PATH)
+        if os.path.exists(CONFIG_FILE_PATH):
+            self._settings = self._load_yaml(CONFIG_FILE_PATH)
+        else:
+            self._settings = {
+               'service': {
+                    'days_back': 0,
+                    'cache_time_hours': 8
+                }
+            }
         self.FEEDS_FILE_PATH = FEEDS_FILE_PATH
         self.CONFIG_FILE_PATH = CONFIG_FILE_PATH
         self.CACHE_DIR = CACHE_DIR
