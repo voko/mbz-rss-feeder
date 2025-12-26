@@ -45,7 +45,7 @@ This is a local container running with data stored in ./local/testdata
   -p 8080:8080 -e LOG_LEVEL=debug --rm --name mbz-rss\
   -v ./local/testdata/:/var/mbz-rss-feeder \
   --env-file ./local/testdata/.env \
-  docker.io/library/mzb-rss-feeder:1.0.0`
+  docker.io/library/mzb-rss-feeder:latest`
 
 After startup the server can be accessed through http://docker-host:8080.
 
