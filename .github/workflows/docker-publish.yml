@@ -13,6 +13,26 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
+  tag-release:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    needs: build-and-push-image
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Read version from file
+        id: version
+        run: echo "TAG=$(cat VERSION)" >> $GITHUB_OUTPUT
+
+      - name: Create and push Git tag
+        run: |
+          git config user.name "${{ github.actor }}"
+          git config user.email "${{ github.actor }}@users.noreply.github.com"
+          git tag -a "${{ steps.version.outputs.TAG }}" -m "Release ${{ steps.version.outputs.TAG }}"
+          git push origin "${{ steps.version.outputs.TAG }}"
   build-and-push-image:
     runs-on: ubuntu-latest
     permissions:
