@@ -16,6 +16,13 @@ log_format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 mbz_log_level_str = os.environ.get('MBZ_LOG_LEVEL', 'WARNING').upper()
 mbz_log_level = getattr(logging, mbz_log_level_str, logging.WARNING)
 
+# file system init
+if not os.path.exists(os.path.dirname(log_file)):
+    os.makedirs(os.path.dirname(log_file))
+if not os.path.exists(os.path.dirname(config.CACHE_DIR)):
+    os.makedirs(os.path.dirname(config.CACHE_DIR))
+
+
 # Configure root logger
 root_logger = logging.getLogger()
 root_logger.setLevel(log_level)
