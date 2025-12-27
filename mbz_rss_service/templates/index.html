@@ -11,7 +11,7 @@
                     ({{ feed.artists|length }})
                 </div>
                 <div class="item-actions">
-                    <a href="{{ url_for('get_feed_rss', feed_id=feed.id) }}">RSS</a>
+                    <a href="{{ url_for('get_feed_rss', feed_id=feed.id) }}">RSS</a> | <a href="{{ service_base_url }}/feed/{{ feed.id }}">service rss</a>
                     <form class="form-inline" action="{{ url_for('delete_feed', feed_id=feed.id) }}" method="post">
                         <button type="submit">Delete</button>
                     </form>

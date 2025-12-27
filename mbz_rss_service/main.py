@@ -9,6 +9,8 @@ import os
 import sys
 from . import musicbrainz
 
+XML_CONTENT_TYPE = "application/xml"
+
 log_level_str = os.environ.get('LOG_LEVEL', 'INFO').upper()
 log_level = getattr(logging, log_level_str, logging.INFO)
 log_file = os.path.expandvars(os.environ.get('LOG_FILE', '/var/mbz-rss-feeder/log/mbz-rss-feeder.log'))
@@ -55,7 +57,7 @@ for handler in werkzeug_logger.handlers:
 logger = logging.getLogger(__name__)
 
 
-logger.info(f"Starting mzb-rss-service v{config.VERSION} with the following configuration:")
+logger.info(f"Starting mbz-rss-service v{config.VERSION} with the following configuration:")
 logger.info(f"  - Log Level: {log_level_str}")
 logger.info(f"  - Log File: {log_file}")
 logger.info(f"  - Feeds File: {config.FEEDS_FILE_PATH}")
@@ -69,6 +71,10 @@ logger.info(f"  - MusicBrainz Log Level: {mbz_log_level_str}")
 # init
 musicbrainz.init_musicbrainz()
 app = Flask(__name__)
+
+@app.context_processor
+def inject_service_name():
+    return {'service_base_url': config.MBZ_SERVICE_BASE_URL}
 
 class ReverseProxied(object):
     def __init__(self, app):
@@ -154,7 +160,7 @@ def _check_cache(feed_id):
         try:
             with open(cache_file, 'r') as f:
                 logger.debug(f"Serving cached feed for {feed_id}")
-                return f.read(), {"Content-Type": "application/xml"}
+                return f.read(), {"Content-Type": XML_CONTENT_TYPE}
         except IOError as e:
             logger.warning(f"Could not read cache file {cache_file}: {e}")
 
@@ -195,7 +201,8 @@ def add_artist(feed_id):
     artist_name = request.form.get('artist_name')
     logger.debug(f"Request to add artist '{artist_name}' ({artist_id}) to feed {feed_id}")
     if artist_id and artist_name:
-        config.add_artist_to_feed(feed_id, artist_id, artist_name)
+        meta = musicbrainz.get_artist_meta_by_id(artist_id)
+        config.add_artist_to_feed(feed_id, artist_id, artist_name, meta['links'])
     return redirect(url_for('edit_feed', feed_id=feed_id))
 
 @app.route("/feed/<feed_id>/artist/<artist_id>/remove", methods=["POST"])
@@ -228,7 +235,7 @@ def opml():
     logger.debug("Request for OPML file")
     feeds = config.feeds
     opml_content = render_template('opml.xml', feeds=feeds)
-    return opml_content, {"Content-Type": "application/xml"}
+    return opml_content, {"Content-Type": XML_CONTENT_TYPE}
 
 @app.route('/feed/<feed_id>')
 def get_feed_rss(feed_id):
@@ -277,7 +284,7 @@ def get_feed_rss(feed_id):
     except IOError as e:
         logger.warning(f"Could not write feed '{feed_data['name']}' to cache file {cache_file}: {e}")
 
-    return rss_content, {"Content-Type": "application/xml"}
+    return rss_content, {"Content-Type": XML_CONTENT_TYPE}
 
 @app.route("/health")
 def health_check():

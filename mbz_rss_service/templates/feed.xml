@@ -14,10 +14,17 @@
             <link>https://musicbrainz.org/release/{{ release.id }}</link>
             <guid isPermaLink="false">{{ release.id }}</guid>
             <description><![CDATA[
+                {% if release.hasCoverArt %}
+                    <img src="https://coverartarchive.org/release/{{ release.id }}/front" alt="Cover Art {{ release.title }}">
+                {% endif %}
                 <p><b>{{ release.artist.name }}</b> <i>{{ release.title }}</i><br>
                 Release Date: {{ release.date }}</p>
-                {% if release.hasCoverArt %}
-                    <img src="http://coverartarchive.org/release/{{ release.id }}/front-500" alt="Cover Art {{ release.title }}">
+                {% if release.links %}
+                <p><b>Links: </b>
+                {% for type, url in release.links.items() %}
+                    <a href="{{ url }}" target="_blank">{{ type | capitalize }}</a>{% if not loop.last %} | {% endif %}
+                {% endfor %}
+                </p>
                 {% endif %}
             ]]></description>
             {% if release.pub_date %}

@@ -11,9 +11,10 @@ logger = logging.getLogger(__name__)
 FEEDS_FILE_PATH = os.path.expandvars(os.environ.get('FEEDS_FILE_PATH', '/var/mbz-rss-feeder/feeds.yml'))
 CONFIG_FILE_PATH = os.path.expandvars(os.environ.get('CONFIG_FILE_PATH', '/var/mbz-rss-feeder/etc/mbz-rss-feeder.yml'))
 CACHE_DIR = os.path.expandvars(os.environ.get('CACHE_DIR', '/var/mbz-rss-feeder/cache'))
-MB_APP_NAME = os.path.expandvars(os.environ.get('MB_APP_NAME', 'mzb-rss-service'))
-MB_VERSION = os.path.expandvars(os.environ.get('MB_VERSION', '0.1.0'))
+MB_APP_NAME = os.path.expandvars(os.environ.get('MB_APP_NAME', 'mbz-rss-service'))
+MB_VERSION = os.path.expandvars(os.environ.get('MB_VERSION', '1'))
 MB_CONTACT = os.path.expandvars(os.environ.get('MB_CONTACT', 'someone@somewhere.com'))
+MBZ_SERVICE_BASE_URL = os.path.expandvars(os.environ.get('MBZ_SERVICE_BASE_URL', 'http://mbz-rss-feeder:8080'))
 
 # file system dir check
 if not os.path.exists(CACHE_DIR):
@@ -41,6 +42,8 @@ class Config:
         self.MB_APP_NAME = MB_APP_NAME
         self.MB_VERSION = MB_VERSION
         self.MB_CONTACT = MB_CONTACT
+        self.MBZ_SERVICE_BASE_URL = MBZ_SERVICE_BASE_URL
+
         try:
             with open(os.path.join(os.path.dirname(__file__), '..', 'VERSION')) as f:
                 self.VERSION = f.read().strip()
@@ -68,9 +71,12 @@ class Config:
             backup_path = f"{file_path}.{datetime.now().strftime('%Y%m%d%H%M%S')}.bak"
             shutil.copy(file_path, backup_path)
 
+        logger.debug(f"Saving yaml to {file_path}")
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
         with open(file_path, 'w') as f:
             yaml.dump(data, f, default_flow_style=False, sort_keys=False)
+
+        logger.debug(f"Saved yaml to {file_path}")
 
     @property
     def feeds(self):
@@ -105,13 +111,16 @@ class Config:
             self._feeds_data['feeds'] = [feed for feed in self.feeds if feed['id'] != feed_id]
             self.save_feeds()
 
-    def add_artist_to_feed(self, feed_id, artist_id, artist_name):
+    def add_artist_to_feed(self, feed_id, artist_id, artist_name, links = None):
         for feed in self.feeds:
             if feed['id'] == feed_id:
                 if 'artists' not in feed:
                     feed['artists'] = []
                 if not any(a['id'] == artist_id for a in feed['artists']):
-                    feed['artists'].append({'id': artist_id, 'name': artist_name})
+                    artist_data = {'id': artist_id, 'name': artist_name}
+                    if links:
+                        artist_data['links'] = links
+                    feed['artists'].append(artist_data)
                     feed['updated_at'] = datetime.now(timezone.utc).isoformat()
                     self.save_feeds()
                 break

@@ -26,7 +26,7 @@ RUN mkdir -p /var/mbz-rss-feeder/cache /var/mbz-rss-feeder/log /var/mbz-rss-feed
 
 # Test stage
 FROM builder AS test
-COPY mzb_rss_service/tests/requirements.txt .
+COPY mbz_rss_service/tests/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 CMD ["python -m pytest"]
@@ -35,8 +35,8 @@ CMD ["python -m pytest"]
 FROM base AS final
 COPY --from=builder /usr/local/lib/python3.10/site-packages /usr/local/lib/python3.10/site-packages
 COPY --from=builder /usr/local/bin /usr/local/bin
-COPY mzb_rss_service mzb_rss_service
+COPY mbz_rss_service mbz_rss_service
 COPY VERSION .
 
 EXPOSE 8080
-CMD ["gunicorn", "--bind", "0.0.0.0:8080", "mzb_rss_service.main:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8080", "mbz_rss_service.main:app"]
