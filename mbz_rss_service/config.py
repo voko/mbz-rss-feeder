@@ -68,9 +68,12 @@ class Config:
             backup_path = f"{file_path}.{datetime.now().strftime('%Y%m%d%H%M%S')}.bak"
             shutil.copy(file_path, backup_path)
 
+        logger.debug(f"Saving yaml to {file_path}")
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
         with open(file_path, 'w') as f:
             yaml.dump(data, f, default_flow_style=False, sort_keys=False)
+
+        logger.debug(f"Saved yaml to {file_path}")
 
     @property
     def feeds(self):
@@ -105,13 +108,16 @@ class Config:
             self._feeds_data['feeds'] = [feed for feed in self.feeds if feed['id'] != feed_id]
             self.save_feeds()
 
-    def add_artist_to_feed(self, feed_id, artist_id, artist_name):
+    def add_artist_to_feed(self, feed_id, artist_id, artist_name, links = None):
         for feed in self.feeds:
             if feed['id'] == feed_id:
                 if 'artists' not in feed:
                     feed['artists'] = []
                 if not any(a['id'] == artist_id for a in feed['artists']):
-                    feed['artists'].append({'id': artist_id, 'name': artist_name})
+                    artist_data = {'id': artist_id, 'name': artist_name}
+                    if links:
+                        artist_data['links'] = links
+                    feed['artists'].append(artist_data)
                     feed['updated_at'] = datetime.now(timezone.utc).isoformat()
                     self.save_feeds()
                 break

@@ -1,6 +1,6 @@
+import re
 import musicbrainzngs
 import logging
-import os
 from .config import config
 from datetime import datetime
 from email.utils import formatdate
@@ -62,6 +62,10 @@ def _process_release(release, artist_id):
     release_date = release.get('date', 'Unknown')
     _, pub_date = _parse_release_date(release_date, release['title'])
 
+    links = {}
+    if 'url-relation-list' in release:
+        links = get_artist_relation_links(release['url-relation-list'])
+
     return {
         'artist': {
             'name': config.get_artist_name(artist_id),
@@ -72,8 +76,54 @@ def _process_release(release, artist_id):
         'title': release['title'],
         'date': release_date,
         'pub_date': pub_date,
-        'release-group': release.get('release-group', {})
+        'release-group': release.get('release-group', {}),
+        'links': links,
     }
+def get_artist_meta_by_id(artist_id):
+    """get additional meta data about an artist"""
+    meta = {
+        'links': {}
+    }
+    try:
+        logger.debug(f"Fetching artist {artist_id} meta data")
+        # Fetch artist data including URL relations
+        result = musicbrainzngs.get_artist_by_id(artist_id, includes=["url-rels"])
+        artist_data = result.get('artist', {})
+
+        if 'url-relation-list' in artist_data:
+            meta['links'] = get_artist_relation_links(artist_data['url-relation-list'])
+        else:
+            meta['links'] = None
+
+        return meta
+
+    except musicbrainzngs.WebServiceError as exc:
+        logger.error(f"Error fetching artist {artist_id} meta data from MusicBrainz: {exc}")
+
+    return meta
+
+def get_artist_relation_links(relationlist):
+    """Parse and extract named links from a MusicBrainz URL relation list."""
+    links = {}
+    for rel in relationlist:
+        target = rel.get('target')
+        if not target:
+            continue
+        if re.match(r'^https://.*imdb\.com', target):
+            links['IMDb'] = target
+        elif re.match(r'^https://music\.apple\.com', target):
+            links['apple'] = target
+        elif re.match(r'^https://music\.amazon\.com', target):
+            links['amazon'] = target
+        elif re.match(r'^https://open\.spotify\.com', target):
+            links['spotify'] = target
+        elif re.match(r'^https://.*qobuz\.com', target):
+            links['qobuz'] = target
+        elif re.match(r'^https://.*deezer\.com', target):
+            links['deezer'] = target
+        elif re.match(r'^https://.*beatport\.com', target):
+            links['beatport'] = target
+    return links
 
 def get_artist_releases(artist_id):
     """Fetch releases for a given artist ID from MusicBrainz."""
@@ -83,7 +133,7 @@ def get_artist_releases(artist_id):
         result = musicbrainzngs.browse_releases(
             artist=artist_id,
             release_type=['album'],
-            includes=['release-groups']
+            includes=['release-groups', 'url-rels']
         )
         
         releases = []
