@@ -55,7 +55,7 @@ for handler in werkzeug_logger.handlers:
 logger = logging.getLogger(__name__)
 
 
-logger.info(f"Starting mzb-rss-service v{config.VERSION} with the following configuration:")
+logger.info(f"Starting mbz-rss-service v{config.VERSION} with the following configuration:")
 logger.info(f"  - Log Level: {log_level_str}")
 logger.info(f"  - Log File: {log_file}")
 logger.info(f"  - Feeds File: {config.FEEDS_FILE_PATH}")
