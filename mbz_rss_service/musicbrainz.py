@@ -109,7 +109,7 @@ def get_artist_relation_links(relationlist):
         target = rel.get('target')
         if not target:
             continue
-        if re.match(r'^https://.*imdb\.com', target):
+        if re.match(r'^https://([^/]+\.)?imdb\.com', target):
             links['IMDb'] = target
         elif re.match(r'^https://music\.apple\.com', target):
             links['apple'] = target
@@ -117,11 +117,11 @@ def get_artist_relation_links(relationlist):
             links['amazon'] = target
         elif re.match(r'^https://open\.spotify\.com', target):
             links['spotify'] = target
-        elif re.match(r'^https://.*qobuz\.com', target):
+        elif re.match(r'^https://([^/]+\.)?qobuz\.com', target):
             links['qobuz'] = target
-        elif re.match(r'^https://.*deezer\.com', target):
+        elif re.match(r'^https://([^/]+\.)?deezer\.com', target):
             links['deezer'] = target
-        elif re.match(r'^https://.*beatport\.com', target):
+        elif re.match(r'^https://([^/]+\.)?beatport\.com', target):
             links['beatport'] = target
     return links
 

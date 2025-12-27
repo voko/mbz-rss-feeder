@@ -72,6 +72,10 @@ logger.info(f"  - MusicBrainz Log Level: {mbz_log_level_str}")
 musicbrainz.init_musicbrainz()
 app = Flask(__name__)
 
+@app.context_processor
+def inject_service_name():
+    return {'service_base_url': config.MBZ_SERVICE_BASE_URL}
+
 class ReverseProxied(object):
     def __init__(self, app):
         self.app = app

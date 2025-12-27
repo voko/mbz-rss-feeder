@@ -14,6 +14,7 @@ CACHE_DIR = os.path.expandvars(os.environ.get('CACHE_DIR', '/var/mbz-rss-feeder/
 MB_APP_NAME = os.path.expandvars(os.environ.get('MB_APP_NAME', 'mbz-rss-service'))
 MB_VERSION = os.path.expandvars(os.environ.get('MB_VERSION', '1'))
 MB_CONTACT = os.path.expandvars(os.environ.get('MB_CONTACT', 'someone@somewhere.com'))
+MBZ_SERVICE_BASE_URL = os.path.expandvars(os.environ.get('MBZ_SERVICE_BASE_URL', 'http://mbz-rss-feeder:8080'))
 
 # file system dir check
 if not os.path.exists(CACHE_DIR):
@@ -41,6 +42,8 @@ class Config:
         self.MB_APP_NAME = MB_APP_NAME
         self.MB_VERSION = MB_VERSION
         self.MB_CONTACT = MB_CONTACT
+        self.MBZ_SERVICE_BASE_URL = MBZ_SERVICE_BASE_URL
+
         try:
             with open(os.path.join(os.path.dirname(__file__), '..', 'VERSION')) as f:
                 self.VERSION = f.read().strip()
